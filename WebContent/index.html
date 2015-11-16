@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Consulta de Notas</title>
+	
+	<link href="estilos.css" type="text/css" rel="stylesheet"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript">
+		var pLectivo;
+		var lectivos;
+		
+		// Función que consume el recurso de los años lectivos
+		$(function()
+			{	// al usar el get llamo al recurso, y uso una función para pasarlo a usar.
+				$.get('http://lisrestful.azurewebsites.net//api/periodoLectivo')
+				.success(function(pLectivo){
+					console.log(pLectivo);
+					lectivos = document.getElementById("periodosLectivos");
+					// Ciclo que carga los años lectivos en un arreglo para el combo
+					for (var i = 0; i < pLectivo.length; i++) {
+						lectivos.options[i] = new Option(''+pLectivo[i].nom_periodo+'', ''+pLectivo[i].cod_periodo+'');
+					}
+				});
+			}
+		);
+	
+				
+		function limpiarTabla()
+		{
+			var tab = document.getElementById("notasAlumno");
+			var filas = tab.rows.length;
+			
+			if (filas > 2)
+			{
+				for (var i = 2; i < filas; i++) 
+				{
+					document.getElementById("notasAlumno").deleteRow(0);
+				}
+			}
+						
+		}
+		
+		var calAlumno;
+		function llamarDatos (cod_estudiante, cod_lectivo)
+		{						
+			var urlTemp = "http://lisrestful.azurewebsites.net/api/notas?cod_estudiante="+cod_estudiante+"&cod_lectivo="+cod_lectivo;
+			$.get(urlTemp).success(function(calAlumno)
+			{
+				console.log(calAlumno);
+				if (calAlumno.length!=0){
+					nombreAlumno.value = calAlumno[0].nom_estudiante+' '+calAlumno[0].ape_estudiante;
+					carreraAlumno.value = calAlumno[0].nom_carrera;
+					
+					var table = document.getElementById("notasAlumno");
+															
+					for (var i = 0; i < calAlumno.length; i++) {
+					      var row = table.insertRow(0);
+					      var cell1 = row.insertCell(0);
+					      var cell2 = row.insertCell(1);
+					      var cell3 = row.insertCell(2);
+					      var cell4 = row.insertCell(3);
+					      var cell5 = row.insertCell(4);
+					      var cell6 = row.insertCell(5);
+					      var cell7 = row.insertCell(6);
+					      var cell8 = row.insertCell(7);
+					      cell1.innerHTML = calAlumno[i].nom_materia;
+					      cell2.innerHTML = calAlumno[i].primer_academica;
+					      cell3.innerHTML = calAlumno[i].primer_evaluacion;
+					      cell4.innerHTML = calAlumno[i].primer_promedio;
+					      cell5.innerHTML = calAlumno[i].segundo_academica;
+					      cell6.innerHTML = calAlumno[i].segundo_evaluacion;
+					      cell7.innerHTML = calAlumno[i].segundo_promedio;
+					      cell8.innerHTML = calAlumno[i].promedio;				
+					}
+					
+				}				
+			});
+		}
+		
+	</script>
+	
+</head>
+<body>
+	<div id="contenedor">
+		<h2 align="center">Buscador de Notas</h2>
+		
+		<form id="frmDatos">
+		
+			<ul>
+				<li class="derecha">
+					<div>
+						<span class="tercio">
+							<input type="text" id="numeroCedula" name="numeroCedula" value=""/>
+							<label for="numeroCedula">Numero de Cédula</label>
+						</span>
+
+						<span class="dostercios">
+							<select id="periodosLectivos"></select>
+							<label for="periodosLectivos">Periodo Lectivo</label>
+						</span>
+					</div>					
+				</li>
+				
+				<li class="botones">
+					<input type="button" onclick="limpiarTabla();llamarDatos(numeroCedula.value, periodosLectivos.value)" value="Buscar"/>
+				</li>
+			</ul>
+			
+			<ul>
+				<li class="izquierda">
+					<div>
+						<span class="completo">
+							<input type="text" id="nombreAlumno" name="nombreAlumno" value="" />
+							<label for="nombreAlumno">Nombre de Alumno: </label>
+						</span>
+
+						<span class="completo">
+							<input type="text" id="carreraAlumno" name="carreraAlumno" value=""/>
+							<label for="carreraAlumno">Carrera: </label>
+						</span>
+					</div>					
+				</li>
+			</ul>
+			
+		</form>	
+	</div>
+	
+	<div id="notas" style="text-align:center;">
+		<table id="notasAlumno" border="1" style="margin: 0 auto;">
+			<tr><th>MATERIA</th><th>Académico</th><th>Evaluación</th><th>Promedio</th><th>Académico</th><th>Evaluación</th><th>Promedio</th></tr>
+			<tr><th></th><th colspan="3" style="text-align:center">PRIMER PARCIAL</th><th colspan="3" style="text-align:center">SEGUNDO PARCIAL</th><th rowspan="2">PROM.</th></tr>
+		</table>
+	</div>
+	
+	<div id="integrantes" style="text-align:center">
+		<table id="integrantesGrupo" style="margin: 0 auto;">
+			<caption>Integrantes</caption>
+			<tbody>
+				<tr>
+					<td>Arévalo David, </td>
+					<td>Gómez Josselyn, </td>
+					<td>Hipo Abigail, </td>
+					<td>Vargas Giovanny</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+				
+</body>
+</html>
